@@ -1,7 +1,7 @@
-# \[Group name\]
+# \[mit hemmelige hold\]
 
 **Group members:**
-- A
+- Villiam Bo Bresler
 - B
 - C
 
