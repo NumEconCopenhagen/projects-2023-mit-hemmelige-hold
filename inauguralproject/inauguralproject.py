@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 class HouseholdSpecializationModelClass:
 
-    def __init__(self):
+    def __init__(self, alpha, sigma):
         """ setup model """
 
         # a. create namespaces
@@ -22,8 +22,8 @@ class HouseholdSpecializationModelClass:
         par.omega = 0.5 
 
         # c. household production
-        par.alpha = 0.5
-        par.sigma = 1.0
+        par.alpha = alpha
+        par.sigma = sigma
 
         # d. wages
         par.wM = 1.0
@@ -44,7 +44,7 @@ class HouseholdSpecializationModelClass:
         sol.beta1 = np.nan
 
     def calc_utility(self,LM,HM,LF,HF):
-        """ calculate utility """
+        """ calculate utility returns net utility. (utility - disutility) for given amounts of time spend working."""
 
         par = self.par
         sol = self.sol
@@ -53,7 +53,12 @@ class HouseholdSpecializationModelClass:
         C = par.wM*LM + par.wF*LF
 
         # b. home production
-        H = HM**(1-par.alpha)*HF**par.alpha
+        if par.sigma == 0:
+            H = np.min(HM, HF)
+        elif par.sigma == 1:
+            H = HM**(1-par.alpha)*HF**par.alpha
+        else:
+            H = ((1-par.alpha)*HM**((par.sigma-1)/par.sigma)*par.alpha*HF**((par.sigma-1)/par.sigma))**(par.sigma/(par.sigma-1))
 
         # c. total consumption utility
         Q = C**par.omega*H**(1-par.omega)
