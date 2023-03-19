@@ -114,15 +114,18 @@ class HouseholdSpecializationModelClass:
         return opt
 
 
-    def solve(self,do_print=False):
+    def solve(self):
         """ solve model continously """
         par = self.par
         sol = self.sol
         opt = SimpleNamespace()
 
         # defines the utility function as the objective fuction to be minimized
-        obj = lambda LM, HM, LF, HF: -self.calc_utility(LM,HM,LF,HF)
-        res = optimize.minimize_scalar(obj, x0= [0,0,0,0],method='Nelder-Mead')
+        obj = lambda x: -self.calc_utility(LM=x[0],HM=x[1],LF=x[2],HF=x[3])
+        bounds      = ((0,24),(0,24),(0,24),(0,24))
+        constraints = ({'type':'ineq','fun':lambda x: 24-x[0]-x[1]}, {'type':'ineq','fun':lambda x: 24-x[2]-x[3]})
+        res = optimize.minimize(obj, x0= [1,1,1,1], method='SLSQP', 
+                                bounds=bounds, constraints=constraints)
 
 
         return res    
