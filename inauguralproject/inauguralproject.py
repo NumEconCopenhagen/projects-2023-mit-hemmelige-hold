@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 class HouseholdSpecializationModelClass:
 
-    def __init__(self, alpha, sigma):
+    def __init__(self, alpha=0.5, sigma=1, wM=1.0, wF=1.0):
         """ setup model """
 
         # a. create namespaces
@@ -26,8 +26,8 @@ class HouseholdSpecializationModelClass:
         par.sigma = sigma
 
         # d. wages
-        par.wM = 1.0
-        par.wF = 1.0
+        par.wM = wM
+        par.wF = wF
         par.wF_vec = np.linspace(0.8,1.2,5)
 
         # e. targets
