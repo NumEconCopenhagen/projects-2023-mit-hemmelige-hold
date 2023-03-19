@@ -112,45 +112,20 @@ class HouseholdSpecializationModelClass:
                 print(f'{k} = {v:6.4f}')
 
         return opt
-    
-# New func: returns for all values of HM HF the optimal utility.
-    def opt_at_HM_HF(self, HM, HF):
-        """ solve model for any given HM and HF """
-        
-        par = self.par
-        sol = self.sol
-        opt = SimpleNamespace()
-        
-        # a. all possible choices
-        x = np.linspace(0,24,49)
-        LM,HM,LF,HF = np.meshgrid(x,x,x,x) # all combinations
-    
-        LM = LM.ravel() # vector
-        LF = LF.ravel()
 
-        # b. calculate utility
-        u = self.calc_utility(LM,HM,LF,HF)
-    
-        # c. set to minus infinity if constraint is broken
-        I = (LM+HM > 24) | (LF+HF > 24) # | is "or"
-        u[I] = -np.inf
-    
-        # d. find maximizing argument
-        j = np.argmax(u)
-        
-        opt.LM = LM[j]
-        opt.HM = HM[j]
-        opt.LF = LF[j]
-        opt.HF = HF[j]
-        opt.u  = u[j]
-
-        return opt
-    
 
     def solve(self,do_print=False):
         """ solve model continously """
+        par = self.par
+        sol = self.sol
+        opt = SimpleNamespace()
 
-        pass    
+        # defines the utility function as the objective fuction to be minimized
+        obj = lambda LM, HM, LF, HF: -self.calc_utility(LM,HM,LF,HF)
+        res = optimize.minimize_scalar(obj, x0= [0,0,0,0],method='Nelder-Mead')
+
+
+        return res    
 
     def solve_wF_vec(self,discrete=False):
         """ solve model for vector of female wages """
