@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 class HouseholdSpecializationModelClass:
 
-    def __init__(self, alpha=0.5, sigma=1, wM=1.0, wF=1.0):
+    def __init__(self, alpha=0.5, sigma=1, wM=1.0, wF=1.0, wF_vec=np.linspace(0.8,1.2,5)):
         """ setup model """
 
         # a. create namespaces
@@ -28,7 +28,7 @@ class HouseholdSpecializationModelClass:
         # d. wages
         par.wM = wM
         par.wF = wF
-        par.wF_vec = np.linspace(0.8,1.2,5)
+        par.wF_vec = wF_vec
 
         # e. targets
         par.beta0_target = 0.4
@@ -130,23 +130,58 @@ class HouseholdSpecializationModelClass:
 
         return res    
 
-    def solve_wF_vec(self,discrete=False):
+    def solve_wF_vec(self, alpha=0.5,sigma=1):
         """ solve model for vector of female wages """
+        par = self.par
+        sol = self.sol
 
-        pass
+        #apply the alpha and sigma parameters
+        par.alpha = alpha
+        par.sigma = sigma
 
-    def run_regression(self):
+        # defines the utility function as the objective fuction to be minimized
+        bounds      = ((0,24),(0,24),(0,24),(0,24))
+        constraints = ({'type':'ineq','fun':lambda x: 24-x[0]-x[1]}, {'type':'ineq','fun':lambda x: 24-x[2]-x[3]})
+        j = 0
+
+        for wf in par.wF_vec:
+                par.wF = wf
+                obj = lambda x: -self.calc_utility(LM=x[0],HM=x[1],LF=x[2],HF=x[3])
+
+                res = optimize.minimize(obj, x0= [1,1,1,1], method='SLSQP', 
+                                        bounds=bounds, constraints=constraints)
+                
+                sol.LM_vec[j] = res.x[0]
+                sol.HM_vec[j] = res.x[1]
+                sol.LF_vec[j] = res.x[2]
+                sol.HF_vec[j] = res.x[3]
+                j = j +1
+
+        # function only returns values of log(Hf/Hm) and log(wf)
+        l_hf_hm = np.log(sol.HF_vec/sol.HM_vec)
+        l_wf_wm = np.log(par.wF_vec)
+        return l_hf_hm, l_wf_wm
+
+    def run_regression(self, a=0.5,s=1):
         """ run regression """
 
         par = self.par
         sol = self.sol
 
+        # the model is solved for different values of wf
+        self.solve_wF_vec(alpha=a,sigma=s)
+
+        # the model betas are calculated
         x = np.log(par.wF_vec)
         y = np.log(sol.HF_vec/sol.HM_vec)
         A = np.vstack([np.ones(x.size),x]).T
         sol.beta0,sol.beta1 = np.linalg.lstsq(A,y,rcond=None)[0]
+        return sol.beta0, sol.beta1
     
-    def estimate(self,alpha=None,sigma=None):
+    def estimate(self):
         """ estimate alpha and sigma """
-
-        pass
+        # i write the complicated lambda function using the run regression function.
+        obj = lambda x: (0.4-self.run_regression(a=x[0],s=x[1])[0])**2+(-0.1-self.run_regression(a=x[0],s=x[1])[1])**2
+        res = optimize.minimize(obj, x0= [0.5,0.5], method='Nelder-Mead')
+        
+        return res
