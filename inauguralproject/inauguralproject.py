@@ -59,9 +59,9 @@ class HouseholdSpecializationModelClass:
         if par.sigma == 1:
 #            print(f"sigma 1: {par.sigma}")
             H = HM**(1-par.alpha)*HF**par.alpha
-        if par.sigma!=0.0000 and par.sigma!=1.000:
+        if par.sigma!=0 and par.sigma!=1:
 #            print(f"sigma ikke 0 eller 1: {par.sigma}")
-            H = ((1-par.alpha)*HM**((par.sigma-1)/par.sigma)*par.alpha*HF**((par.sigma-1)/par.sigma))**(par.sigma/(par.sigma-1))
+            H = ((1-par.alpha)*HM**((par.sigma-1)/par.sigma)+par.alpha*HF**((par.sigma-1)/par.sigma))**(par.sigma/(par.sigma-1))
 
         # c. total consumption utility
         Q = C**par.omega*H**(1-par.omega)
@@ -247,7 +247,7 @@ class NewModelClass:
             H = HM**(1-par.alpha)*HF**par.alpha
         if par.sigma!=0.0000 and par.sigma!=1.000:
 #            print(f"sigma ikke 0 eller 1: {par.sigma}")
-            H = ((1-par.alpha)*HM**((par.sigma-1)/par.sigma)*par.alpha*HF**((par.sigma-1)/par.sigma))**(par.sigma/(par.sigma-1))
+            H = ((1-par.alpha)*HM**((par.sigma-1)/par.sigma)+par.alpha*HF**((par.sigma-1)/par.sigma))**(par.sigma/(par.sigma-1))
 
         # c. total consumption utility
         Q = C**par.omega*H**(1-par.omega)
