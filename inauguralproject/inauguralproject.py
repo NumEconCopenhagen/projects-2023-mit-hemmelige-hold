@@ -123,9 +123,8 @@ class HouseholdSpecializationModelClass:
         obj = lambda x: -self.calc_utility(LM=x[0],HM=x[1],LF=x[2],HF=x[3])
         bounds      = ((0,24),(0,24),(0,24),(0,24))
         constraints = ({'type':'ineq','fun':lambda x: 24-x[0]-x[1]}, {'type':'ineq','fun':lambda x: 24-x[2]-x[3]})
-        res = optimize.minimize(obj, x0= [1,1,1,1], method='SLSQP', 
+        res = optimize.minimize(obj, x0= [12,12,12,12], method='SLSQP', 
                                 bounds=bounds, constraints=constraints)
-
 
         return res    
 
@@ -147,7 +146,7 @@ class HouseholdSpecializationModelClass:
                 par.wF = wf
                 obj = lambda x: -self.calc_utility(LM=x[0],HM=x[1],LF=x[2],HF=x[3])
 
-                res = optimize.minimize(obj, x0= [1,1,1,1], method='SLSQP', 
+                res = optimize.minimize(obj, x0= [12,12,12,12], method='SLSQP', 
                                         bounds=bounds, constraints=constraints)
                 
                 sol.LM_vec[j] = res.x[0]
