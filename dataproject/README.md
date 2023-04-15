@@ -7,6 +7,7 @@ The figures, correlations and maps of the project can be seen from running [data
 I use data from the DST API and the geojson file kommuner.geojson:
 
 
-**Dependencies:** Apart from a standard Anaconda Python 3 installation, the project requires the following installations:
+**Dependencies:** Apart from a standard Anaconda Python 3 installation, the project requires the following installations: Geopandas and pydst
 
 conda install geopandas
+conda install pydst
