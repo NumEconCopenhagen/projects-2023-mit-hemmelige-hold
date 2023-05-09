@@ -169,7 +169,6 @@ class RamseyModelClass():
         # d. final evaluation
         eq_sys(x)
 
-
 def production(par,A,K_lag):
     """ production and factor prices """
 
@@ -197,79 +196,3 @@ def production(par,A,K_lag):
         raise Exception('unknown type of production function')
 
     return Y,rk,w            
-        
-def calculate_jacobian(self,h=1e-6):
-        """ calculate jacobian """
-        
-        par = self.par
-        ss = self.ss
-        path = self.path
-        
-        # a. allocate
-        Njac = 2*par.Tpath
-        jac = self.jac = np.nan*np.ones((Njac,Njac))
-        
-        x_ss = np.nan*np.ones((2,par.Tpath))
-        x_ss[0,:] = ss.C
-        x_ss[1,:] = ss.K
-        x_ss = x_ss.ravel()
-
-        # b. baseline errors
-        path.C[:] = ss.C
-        path.K[:] = ss.K
-        base = self.evaluate_path_errors()
-
-        # c. jacobian
-        for i in range(Njac):
-            
-            # i. add small number to a single x (single K or C) 
-            x_jac = x_ss.copy()
-            x_jac[i] += h
-            x_jac = x_jac.reshape((2,par.Tpath))
-            
-            # ii. alternative errors
-            path.C[:] = x_jac[0,:]
-            path.K[:] = x_jac[1,:]
-            alt = self.evaluate_path_errors()
-
-            # iii. numerical derivative
-            jac[:,i] = (alt-base)/h
-      
-def broyden_solver(f,x0,jac,tol=1e-8,maxiter=100,do_print=False):
-    """ numerical equation system solver using the broyden method 
-    
-        f (callable): function return errors in equation system
-        jac (ndarray): initial jacobian
-        tol (float,optional): tolerance
-        maxiter (int,optional): maximum number of iterations
-        do_print (bool,optional): print progress
-
-    """
-
-    # a. initial
-    x = x0.ravel()
-    y = f(x)
-
-    # b. iterate
-    for it in range(maxiter):
-        
-        # i. current difference
-        abs_diff = np.max(np.abs(y))
-        if do_print: print(f' it = {it:3d} -> max. abs. error = {abs_diff:12.8f}')
-
-        if abs_diff < tol: return x
-        
-        # ii. new x
-        dx = np.linalg.solve(jac,-y)
-        assert not np.any(np.isnan(dx))
-        
-        # iii. evaluate
-        ynew = f(x+dx)
-        dy = ynew-y
-        jac = jac + np.outer(((dy - jac @ dx) / np.linalg.norm(dx)**2), dx)
-        y = ynew
-        x += dx
-            
-    else:
-
-        raise ValueError(f'no convergence after {maxiter} iterations')        
