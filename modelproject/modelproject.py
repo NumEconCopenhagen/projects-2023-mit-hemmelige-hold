@@ -321,9 +321,6 @@ class GovernmentRamsey():
         K = path.K
         K_lag = path.K_lag = np.insert(K[:-1],0,par.K_lag_ini)
         
-        # Govenment
-        G = path.G
-
         # Hvis der skal laves en ny ligning skal de rogså defineres nogle nye variable
         # i capital defineres K og K_lag fordi den er bagudskuende
         # i consumptions defineres C og C_plus fordi den er fremadskuende
@@ -339,7 +336,7 @@ class GovernmentRamsey():
         # d. errors (also called H)
         errors = np.nan*np.ones((2,par.Tpath))
         errors[0,:] = C**(-par.sigma) - par.beta*(1+r_plus)*(1-par.tau_k)*C_plus**(-par.sigma)
-        errors[1,:] = K - ((1-par.delta)*K_lag + (path.Y - C - G))
+        errors[1,:] = K - ((1-par.delta)*K_lag + (path.Y - C - path.G))
         
         return errors.ravel()
   
