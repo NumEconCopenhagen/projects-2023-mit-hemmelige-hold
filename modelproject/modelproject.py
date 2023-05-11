@@ -252,8 +252,8 @@ class GovernmentRamsey():
         par.Tpath = 500 # length of transition path, "truncation horizon"
 
         # e. Taxes
-        par.tau_w = 0.001
-        par.tau_k = 0.005
+        par.tau_w = 0.01
+        par.tau_k = 0.01
 
 
     def allocate(self):
@@ -286,7 +286,7 @@ class GovernmentRamsey():
         ss.r = (ss.rk-par.delta)
         
         # c. implied discount factor
-        par.beta = 1/(1+ss.r)
+        par.beta = 1/((1+ss.r)*(1-par.tau_k))
 
         # d. consumption
         ss.G = ss.K*(1+ss.r)*par.tau_k + ss.w * par.tau_w
@@ -332,8 +332,8 @@ class GovernmentRamsey():
         r_plus = np.append(path.r[1:],ss.r)
 
         # goverment
-        path.G = K_lag*(1+path.r)*par.tau_k + path.w * par.tau_w
-
+#        path.G = K_lag*(1+path.r)*par.tau_k + path.w * par.tau_w
+        path.G = K*(1+path.r)*par.tau_k + path.w * par.tau_w
 
         # super vigtigt. Her kan man rette og tilføje ligninger der skal gælde i alle perioder.
         # d. errors (also called H)
