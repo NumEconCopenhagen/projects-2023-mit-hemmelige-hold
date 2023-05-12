@@ -291,6 +291,14 @@ class GovernmentRamsey():
         ss.G = ss.K*(1+ss.r)*par.tau_k + ss.w * par.tau_w
         ss.C = ss.Y - par.delta*ss.K-ss.G
 
+        # I initialize the model
+        self.par.K_lag_ini    = self.ss.K
+        self.path.A[:]        = self.ss.A
+        self.path.C[:]        = self.ss.C
+        self.path.K[:]        = self.ss.K
+        self.path.G[:]        = self.ss.G
+
+
         if do_print:
 
             print(f'Y_ss = {ss.Y:.4f}')
@@ -377,6 +385,13 @@ class GovernmentRamsey():
 
         # d. final evaluation
         eq_sys(x)
+
+
+
+
+
+
+
 
 
 
