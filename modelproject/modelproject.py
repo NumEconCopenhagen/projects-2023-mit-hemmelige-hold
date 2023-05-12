@@ -213,7 +213,7 @@ def production(par,A,K_lag):
 
 class GovernmentRamsey():
 
-    def __init__(self,do_print=True):
+    def __init__(self,do_print=False):
         """ create the model """
 
         if do_print: print('initializing the model:')
@@ -255,7 +255,6 @@ class GovernmentRamsey():
         par.tau_w = 0.01
         par.tau_k = 0.01
 
-
     def allocate(self):
         """ allocate arrays for transition path """
         
@@ -268,7 +267,7 @@ class GovernmentRamsey():
 
     # Minder om at kalibrere modellen, man antager at vi ender i en steady state værdi
     # Det er det første man gør efter man har defineret modellen
-    def find_steady_state(self,KY_ss,do_print=True):
+    def find_steady_state(self,KY_ss,do_print=False):
         """ find steady state """
 
         par = self.par
