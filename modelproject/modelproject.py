@@ -75,8 +75,6 @@ class BasicRamsey():
         for varname in allvarnames:
             path.__dict__[varname] =  np.nan*np.ones(par.Tpath)
 
-    # Minder om at kalibrere modellen, man antager at vi ender i en steady state værdi
-    # Det er det første man gør efter man har defineret modellen
     def find_steady_state(self,KY_ss,do_print=True):
         """ find steady state """
 
@@ -110,8 +108,6 @@ class BasicRamsey():
             print(f'A = {ss.A:.4f}')
             print(f'beta = {par.beta:.4f}')
 
-    # Her opskrives det non-linear equation system H.
-    # linings systemet indeholder alle perioders transitions ligninger For C og K
     def evaluate_path_errors(self):
         """ evaluate errors along transition path """
 
@@ -127,18 +123,11 @@ class BasicRamsey():
         K = path.K
         K_lag = path.K_lag = np.insert(K[:-1],0,par.K_lag_ini)
         
-        # Hvis der skal laves en ny ligning skal de rogså defineres nogle nye variable
-        # i capital defineres K og K_lag fordi den er bagudskuende
-        # i consumptions defineres C og C_plus fordi den er fremadskuende
-        
-
         # c. production and factor prices
         path.Y,path.rk,path.w = production(par,path.A,K_lag)
         path.r = path.rk-par.delta
         r_plus = np.append(path.r[1:],ss.r)
 
-
-        # super vigtigt. Her kan man rette og tilføje ligninger der skal gælde i alle perioder.
         # d. errors (also called H)
         errors = np.nan*np.ones((2,par.Tpath))
         errors[0,:] = C**(-par.sigma) - par.beta*(1+r_plus)*C_plus**(-par.sigma)
@@ -164,7 +153,6 @@ class BasicRamsey():
             # ii. return errors
             return self.evaluate_path_errors()
 
-        # her skal der også tilføjes flere guesses til ligningssystemet hvis man udvider med flere ligninger.
         # b. initial guess
         x0 = np.nan*np.ones((2,par.Tpath))
         x0[0,:] = ss.C
@@ -208,7 +196,6 @@ def production(par,A,K_lag):
         raise Exception('unknown type of production function')
 
     return Y,rk,w    
-
 
 
 class GovernmentRamsey():
@@ -265,8 +252,7 @@ class GovernmentRamsey():
         for varname in allvarnames:
             path.__dict__[varname] =  np.nan*np.ones(par.Tpath)
 
-    # Minder om at kalibrere modellen, man antager at vi ender i en steady state værdi
-    # Det er det første man gør efter man har defineret modellen
+    # the models steady state values are calculated.
     def find_steady_state(self,KY_ss,do_print=False):
         """ find steady state """
 
@@ -311,8 +297,7 @@ class GovernmentRamsey():
             print(f'G = {ss.G:.4f}')
             print(f'C = {ss.C:.4f}')
 
-    # Her opskrives det non-linear equation system H.
-    # linings systemet indeholder alle perioders transitions ligninger For C og K
+    # The equation system H's errors are evalauted, this is the function to be optimized.
     def evaluate_path_errors(self):
         """ evaluate errors along transition path """
 
@@ -328,28 +313,23 @@ class GovernmentRamsey():
         K = path.K
         K_lag = path.K_lag = np.insert(K[:-1],0,par.K_lag_ini)
         
-        # Hvis der skal laves en ny ligning skal de rogså defineres nogle nye variable
-        # i capital defineres K og K_lag fordi den er bagudskuende
-        # i consumptions defineres C og C_plus fordi den er fremadskuende
-        
-
         # c. production and factor prices
         path.Y,path.rk,path.w = production(par,path.A,K_lag)
         path.r = path.rk-par.delta
         r_plus = np.append(path.r[1:],ss.r)
 
         # goverment
-#        path.G = K_lag*(1+path.r)*par.tau_k + path.w * par.tau_w
         path.G = K*(1+path.r)*par.tau_k + path.w * par.tau_w
 
-        # super vigtigt. Her kan man rette og tilføje ligninger der skal gælde i alle perioder.
+        # The intertemporal equations have been changed in accordance with the new model.
         # d. errors (also called H)
         errors = np.nan*np.ones((2,par.Tpath))
         errors[0,:] = C**(-par.sigma) - par.beta*(1+r_plus)*(1-par.tau_k)*C_plus**(-par.sigma)
         errors[1,:] = K - ((1-par.delta)*K_lag + (path.Y - C - path.G))
         
         return errors.ravel()
-  
+    
+    # The model is solved, by minimizing the errors in the H equations.
     def solve(self,do_print=True):
         """ solve for the transition path """
 
@@ -368,7 +348,6 @@ class GovernmentRamsey():
             # ii. return errors
             return self.evaluate_path_errors()
 
-        # her skal der også tilføjes flere guesses til ligningssystemet hvis man udvider med flere ligninger.
         # b. initial guess
         x0 = np.nan*np.ones((2,par.Tpath))
         x0[0,:] = ss.C
