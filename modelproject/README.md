@@ -1,6 +1,6 @@
 # Model analysis project
 
-Our project is titled **Dynamics of the Ramsey model with taxation**. In the project i extend the basic Ramsey model introduced in the lectures with government spending and taxation. I solve the dynamic Ramsey model numericly. 
+Our project is titled **Dynamics of the Ramsey model with taxation**. In the project i extend the basic Ramsey model introduced in the lectures with government spending and taxation. I solve the dynamic Ramsey model numerically. 
 
 The results of the project can be seen from running [modelproject.ipynb](modelproject.ipynb).
 
